@@ -1,25 +1,20 @@
 # 1. Labels #
 ##
+```
 oc label node node1 env=dev 
-
 oc label node node2 env=prod
-
 oc label node node1 env=test --overwrite
-
 oc get nodes --show-labels
-
 oc label node node1 env-
-
+```
 # 2. Node Selector #
 ##
+```
 oc patch deployment/myapp --patch '{"spec":{"template":{"spec":{"nodeSelector":{"env":"dev"}}}}}'
-
 oc adm new-project demo --node-selector "env=dev"
-
 oc annotate namespace demo openshift.io/node-selector "env=dev" --overwrite
-
 oc patch namespace demo --patch '{"metadata":{"annotations":{"openshift.io/node-selector": "env=dev"}}}'
-
+```
 # 3. Taints #
 ##
 oc adm taint nodes node1 dedicated=foo:NoSchedule -o json --dry-run=client | jq .spec.taints
@@ -39,9 +34,11 @@ Taints:      dedicated=foo:NoSchedule
              test=foo:NoSchedule
              
 ```
-oc adm taint node node1 dedicated-
+Delete node taint<br/>
+`oc adm taint node node1 dedicated-`
 
-oc adm taint node node1 test-
+Delete the other key<br/>
+`oc adm taint node node1 test-`
 
 # 4. OAuth #
 sudo yum install httpd-tools
