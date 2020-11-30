@@ -232,3 +232,27 @@ oc scale --replicas 3 deployment/demo
 oc autoscale dc/demo --min 1 --max 10 --cpu-percent 80
 
 oc get hpa
+
+# 12. Image Registry #
+##
+Build in registry is housed in openshift-image-registry namespace<br/>
+`oc -n openshift-image-registry get svc`
+
+cluster wide svc nameing scheme is service-name.namespace.svc<br/>
+`image-registry.openshift-image-registry.svc`
+
+using stored images from openshift project
+```
+oc get images
+oc get is -n openshift | grep httpd
+```
+
+```
+oc new-app --name nms --docker-image image-registry.openshift-image-registry.svc:5000/openshift/httpd:latest
+      OR
+oc new-app --name nms image-registry.openshift-image-registry.svc:5000/openshift/httpd:latest
+      OR
+oc new-app --name nms --image image-registry.openshift-image-registry.svc:5000/openshift/httpd:latest
+```
+Create a service<br/>
+`oc expose deployment/nms --port 8080 --target-port 8080`
