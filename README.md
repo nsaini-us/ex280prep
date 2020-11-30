@@ -79,3 +79,30 @@ oc delete identity localusers:user1
 
 oc delete user --all
 oc delete identity --all
+
+# 5. Users, Groups, and Authentication #
+oc __adm__ policy add-cluster-role-to-user cluster-admin user-name    #__cluster role__
+
+oc policy add-role-to-user role-name user-name -n project-name        #__namespace level role__
+
+oc get clusterrolebindings -o wide |grep -E "NAME|self-provisioners"
+
+oc describe clusterrolebindings self-provisioners
+
+oc describe clusterrole self-provisioner
+
+Remove self-provisioner role from system such that authenticated users can't create projects
+- oc adm policy remove-cluster-role-from-group self-provisioner system:authenticated:oauth
+
+Restore self-provisioners back to cluster as original
+- oc adm policy add-cluster-role-to-group --rolebinding-name self-provisioners self-provisioner system:authenticated:oauth
+
+oc adm group new dev-users dev1 dev2
+
+oc adm group new qa-users qa1 qa2
+
+oc policy add-role-to-group __edit__ dev-users -n namespace
+
+oc policy add-role-to-group __view__ qa-users -n namespace
+oc policy add-role-to-user admin user1 -n namespace
+oc 
