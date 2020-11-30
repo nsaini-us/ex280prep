@@ -136,17 +136,21 @@ Make sure you have assigned cluster-admin to someone else before doing this! Ins
 
 # 7. Secrets and ConfigMaps #
 ##
+Create secrets from literals and apply to a deployment
+```
 oc create secret generic secretname --from-literal key1=value1 --from-literal key2=value2
-
 oc set env deployment/hello --from secret/secretname
+```
 
-oc set volume deployment/demo --add --type secret --secret-name demo-secret --mount-path /app-secrets
+Mount the secret file into the pod filesystem<br/>
+`oc set volume deployment/demo --add --type secret --secret-name demo-secret --mount-path /app-secrets`
 
+Example of setting env variables that contain sensitive data
+```
 oc create secret generic mysql --from-literal user=dba --from-literal password=redhat123 --from-literal database=test --from-literal hostname=mysql
-
 oc new-app --name mysql --docker-image registry.access.redhat.com/rhscl/mysql-57-rhel7:5.7-47
-
 oc set env deployment/mysql --prefix MYSQL_ --from secret/mysql
+```
 
 # 8. Secure Routes #
 ##
