@@ -91,11 +91,11 @@ oc describe clusterrolebindings self-provisioners
 
 oc describe clusterrole self-provisioner
 
-Remove self-provisioner role from system such that authenticated users can't create projects
-- oc adm policy remove-cluster-role-from-group self-provisioner system:authenticated:oauth
+Remove self-provisioner role from system such that authenticated users can't create projects<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;oc adm policy remove-cluster-role-from-group self-provisioner system:authenticated:oauth
 
-Restore self-provisioners back to cluster as original
-- oc adm policy add-cluster-role-to-group --rolebinding-name self-provisioners self-provisioner system:authenticated:oauth
+Restore self-provisioners back to cluster as original<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;oc adm policy add-cluster-role-to-group --rolebinding-name self-provisioners self-provisioner system:authenticated:oauth
 
 oc adm group new dev-users dev1 dev2
 
