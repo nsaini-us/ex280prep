@@ -77,7 +77,7 @@ Update the secret with new htpass<br/>
 
 oc delete user user2
 
-oc delete identity localusers:user1
+oc delete identity localusers:user2
 
 oc delete user --all
 oc delete identity --all
@@ -106,5 +106,8 @@ oc adm group new qa-users qa1 qa2
 oc policy add-role-to-group __edit__ dev-users -n namespace
 
 oc policy add-role-to-group __view__ qa-users -n namespace
+
 oc policy add-role-to-user admin user1 -n namespace
-oc 
+
+Get all the rolebindings for the current namespace<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;oc get rolebindings -o wide
