@@ -260,12 +260,16 @@ Create a service<br/>
 # 13. Deployment Strategy #
 ##
 Using a docker strategy using local build directory
-`oc new-app --strategy docker --binary --name myapp`
-`oc start-build myapp --from-dir . --follow`
-`oc expose deployment myapp --target-port 8080 --port 80`
-`oc expose svc myapp`
+```
+oc new-app --strategy docker --binary --name myapp
+oc start-build myapp --from-dir . --follow
+oc expose deployment myapp --target-port 8080 --port 80
+oc expose svc myapp
+```
 
 Using a nodejs builder
-`oc new-app --binary --image-stream nodejs --name nodejs`
-`oc start-build nodejs --from-dir . --follow`
-`oc expose svc/nodejs`
+```
+oc new-app --binary --image-stream nodejs --name nodejs
+oc start-build nodejs --from-dir . --follow
+oc expose svc/nodejs
+```
