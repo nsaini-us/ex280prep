@@ -117,3 +117,53 @@ Get all the rolebindings for the current namespace<br/>
 Make sure you have assigned cluster-admin to someone else before doing this! Instead of removing/deleting the user, we will remove the password from the system. <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;oc delete secret kubeadmin -n kube-system
 
+# 7. Secrets and ConfigMaps #
+##
+oc create secret generic secretname --from-literal key1=value1 --from-literal key2=value2
+
+oc set env deployment/hello --from secret/secretname
+
+oc set volume deployment/demo --add --type secret --secret-name demo-secret --mount-path /app-secrets
+
+oc create secret generic mysql --from-literal user=dba --from-literal password=redhat123 --from-literal database=test --from-literal hostname=mysql
+
+oc new-app --name mysql --docker-image registry.access.redhat.com/rhscl/mysql-57-rhel7:5.7-47
+
+oc set env deployment/mysql --prefix MYSQL_ --from secret/mysql
+
+# 8. Secure Routes #
+##
+```
+openssl req -x509 -newkey rsa:2048 -nodes -keyout cert.key -out cert.crt -subj "/C=US/ST=FL/L=Tampa/O=IBM/CN=*.route-hostname"
+```
+oc create secret tls demo-certs --cert cert.crt --key cert.key
+
+oc set volume deployment/demo --add --type=secret --secret-name demo-tls --mount-path /usr/local/etc/ssl/certs --name tls-mount
+
+oc create route passthrough demo-https --service demo-https --port 8443 --hostname demo-https.apps.ocp4.example.com
+
+oc expose route edge demo-https --service api-frontend --hostname api.apps.acme.com --key cert.key --cert cert.crt
+
+oc extract secrets/router-ca --keys tls.crt -n openshift-ingress-operator --to /tmp/ 
+
+# 9. Security Contexts (SCC) #
+##
+oc get scc
+
+oc describe scc anyuid
+
+oc create serviceaccount svc-name
+
+oc get po/podname-756ff-9cjbj -o yaml | oc adm policy scc-subject-review -f -
+
+oc adm policy add-scc-to-user anyuid -z svc-name -n namespace
+
+oc set serviceaccount deployment/demo svc-name
+
+```
+oc new-app --name gitlab --docker-image quay.io/redhattraiing/gitlab-ce:8.4.3-ce.0
+oc get po/gitlab-6c5b5c5d55-gzkct -o yaml | oc adm policy scc-subject-review -f -
+oc create sa gitlab-sa
+oc adm policy add-scc-to-user anyuid -z gitlab-sa
+oc set sa deployment/gitlab gitlab-sa
+```
