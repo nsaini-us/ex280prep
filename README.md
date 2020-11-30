@@ -146,7 +146,7 @@ oc expose route edge demo-https --service api-frontend --hostname api.apps.acme.
 
 oc extract secrets/router-ca --keys tls.crt -n openshift-ingress-operator --to /tmp/ 
 
-# 9. Security Contexts (SCC) #
+# 9. Security Contexts (SCC) and ServiceAccounts #
 ##
 oc get scc
 
@@ -167,3 +167,68 @@ oc create sa gitlab-sa
 oc adm policy add-scc-to-user anyuid -z gitlab-sa
 oc set sa deployment/gitlab gitlab-sa
 ```
+
+# 10. Limits, Quotas, and LimitRanges #
+##
+Check the node resources<br/>
+`oc describe node node1`
+
+Set resources on a deployment. Request limits are how much each request is allowed, and limit is the max allowed <br/>
+`oc set resources deployment hello-world-nginx --requests cpu=10m,memory=20Mi --limits cpu=180m,memory=100Mi`
+
+Quota is project level resources available<br/>
+`oc create quota dev-quota --hard services=10,cpu=1300,memory=1.5Gi`
+
+Cluster Quota is resources available across multiple projects<br/>
+`oc create clusterquota env-qa --project-annotation-selector.openshift.io/requester=qa --hard pods=12,secrets=20,services=5`
+
+Limit ranges in a yaml file are defined as follows
+```
+apiVersion: "v1"
+kind: "LimitRange"
+metadata:
+  name: "nms-limits"
+spec:
+  limits:
+    - type: "Pod"
+      max:
+        cpu: "2"
+        memory: "1Gi"
+      min:
+        cpu: "200m"
+        memory: "6Mi"
+    - type: "Container"
+      max:
+        cpu: "2"
+        memory: "1Gi"
+      min:
+        cpu: "100m"
+        memory: "4Mi"
+      default:			# default that a container can use if not specified in the Pod spec
+        cpu: "300m"
+        memory: "200Mi"
+      defaultRequest:	# default that a container can request if not specified in the Pod spec
+        cpu: "200m"
+        memory: "100Mi"
+```
+oc create -f limitranges.yaml -n net-ingress
+
+oc describe limits nms-limits -n net-ingress
+```
+Name:       nms-limits
+Namespace:  net-ingress
+Type        Resource  Min   Max  Default Request  Default Limit  Max Limit/Request Ratio
+----        --------  ---   ---  ---------------  -------------  -----------------------
+Pod         cpu       200m  2    -                -              -
+Pod         memory    6Mi   1Gi  -                -              -
+Container   cpu       100m  2    200m             300m           -
+Container   memory    4Mi   1Gi  100Mi            200Mi          -
+
+```
+# 11. Scaling and AutoScaler #
+##
+oc scale --replicas 3 deployment/demo
+
+oc autoscale dc/demo --min 1 --max 10 --cpu-percent 80
+
+oc get hpa
