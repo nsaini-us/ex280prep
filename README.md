@@ -235,7 +235,7 @@ oc get hpa
 
 # 12. Image Registry #
 ##
-Build in registry is housed in openshift-image-registry namespace<br/>
+Built in registry is housed in openshift-image-registry namespace<br/>
 `oc -n openshift-image-registry get svc`
 
 cluster wide svc nameing scheme is service-name.namespace.svc<br/>
@@ -256,3 +256,16 @@ oc new-app --name nms --image image-registry.openshift-image-registry.svc:5000/o
 ```
 Create a service<br/>
 `oc expose deployment/nms --port 8080 --target-port 8080`
+
+# 13. Deployment Strategy #
+##
+Using a docker strategy using local build directory
+`oc new-app --strategy docker --binary --name myapp`
+`oc start-build myapp --from-dir . --follow`
+`oc expose deployment myapp --target-port 8080 --port 80`
+`oc expose svc myapp`
+
+Using a nodejs builder
+`oc new-app --binary --image-stream nodejs --name nodejs`
+`oc start-build nodejs --from-dir . --follow`
+`oc expose svc/nodejs`
