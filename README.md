@@ -147,21 +147,24 @@ Mount the secret file into the pod filesystem<br/>
 
 Example of setting env variables that contain sensitive data
 ```
-oc create secret generic mysql --from-literal user=dba --from-literal password=redhat123 --from-literal database=test --from-literal hostname=mysql
+oc create secret generic mysql --from-literal user=dba --from-literal password=redhat123 \
+    --from-literal database=test --from-literal hostname=mysql
 oc new-app --name mysql --docker-image registry.access.redhat.com/rhscl/mysql-57-rhel7:5.7-47
 oc set env deployment/mysql --prefix MYSQL_ --from secret/mysql
 ```
 To use a private image in quay.io using secrets stored in files
 ```
 podman login -u quay-username quay.io
-oc create secret generic quay-registry --from-file .dockerconfigjson=${XDG_RUNTIME_DIR}/containers/auth.json --type kubernetes.io/dockerconfigjson
+oc create secret generic quay-registry --from-file .dockerconfigjson=${XDG_RUNTIME_DIR}/containers/auth.json \
+    --type kubernetes.io/dockerconfigjson
 oc import-image php --from quay.io/quay-username/php-70-rhel7 --confirm
 ```
 # 8. Secure Routes #
 ##
 Using openssl generate a private key and a public key
 ```
-openssl req -x509 -newkey rsa:2048 -nodes -keyout cert.key -out cert.crt -subj "/C=US/ST=FL/L=Tampa/O=IBM/CN=*.apps.acme.com"
+openssl req -x509 -newkey rsa:2048 -nodes -keyout cert.key -out cert.crt \
+    -subj "/C=US/ST=FL/L=Tampa/O=IBM/CN=*.apps.acme.com"
 ```
 Using the key and cert create a TLS secret<br/>
 `oc create secret tls demo-certs --cert cert.crt --key cert.key`
