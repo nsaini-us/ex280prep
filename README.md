@@ -151,36 +151,52 @@ oc create secret generic mysql --from-literal user=dba --from-literal password=r
 oc new-app --name mysql --docker-image registry.access.redhat.com/rhscl/mysql-57-rhel7:5.7-47
 oc set env deployment/mysql --prefix MYSQL_ --from secret/mysql
 ```
-
+To use a private image in quay.io using secrets stored in files
+```
+podman login -u quay-username quay.io
+oc create secret generic quay-registry --from-file .dockerconfigjson=${XDG_RUNTIME_DIR}/containers/auth.json --type kubernetes.io/dockerconfigjson
+oc import-image php --from quay.io/quay-username/php-70-rhel7 --confirm
+```
 # 8. Secure Routes #
 ##
+Using openssl generate a private key and a public key
 ```
-openssl req -x509 -newkey rsa:2048 -nodes -keyout cert.key -out cert.crt -subj "/C=US/ST=FL/L=Tampa/O=IBM/CN=*.route-hostname"
+openssl req -x509 -newkey rsa:2048 -nodes -keyout cert.key -out cert.crt -subj "/C=US/ST=FL/L=Tampa/O=IBM/CN=*.apps.acme.com"
 ```
-oc create secret tls demo-certs --cert cert.crt --key cert.key
+Using the key and cert create a TLS secret<br/>
+`oc create secret tls demo-certs --cert cert.crt --key cert.key`
 
-oc set volume deployment/demo --add --type=secret --secret-name demo-tls --mount-path /usr/local/etc/ssl/certs --name tls-mount
+Mount the tls certs into the pod (using deployment)<br/>
+`oc set volume deployment/demo --add --type=secret --secret-name demo-tls --mount-path /usr/local/etc/ssl/certs --name tls-mount`
 
-oc create route passthrough demo-https --service demo-https --port 8443 --hostname demo-https.apps.ocp4.example.com
+Now create a passthrough route<br/>
+`oc create route passthrough demo-https --service demo-https --port 8443 --hostname demo-https.apps.ocp4.example.com`
 
-oc expose route edge demo-https --service api-frontend --hostname api.apps.acme.com --key cert.key --cert cert.crt
+Using edge route with same certs<br/>
+`oc expose route edge demo-https --service api-frontend --hostname api.apps.acme.com --key cert.key --cert cert.crt`
 
-oc extract secrets/router-ca --keys tls.crt -n openshift-ingress-operator --to /tmp/ 
+Export the router cert in case we need to use it as a ca-cert<br/>
+`oc extract secrets/router-ca --keys tls.crt -n openshift-ingress-operator --to /tmp/`
 
 # 9. Security Contexts (SCC) and ServiceAccounts #
 ##
-oc get scc
+Get the current SCC roles defined<br/>
+`oc get scc`
 
-oc describe scc anyuid
+Get details of scc anyuid<br/>
+`oc describe scc anyuid`
 
+Create a service account in the current project and assign the anyuid priviledges to the service account.
+```
 oc create serviceaccount svc-name
-
-oc get po/podname-756ff-9cjbj -o yaml | oc adm policy scc-subject-review -f -
-
 oc adm policy add-scc-to-user anyuid -z svc-name -n namespace
-
 oc set serviceaccount deployment/demo svc-name
+```
 
+review the scc priviledges needed for a pod<br/>
+`oc get po/podname-756ff-9cjbj -o yaml | oc adm policy scc-subject-review -f -`
+
+Example of gitlab being run as anyuid using serviceaccount
 ```
 oc new-app --name gitlab --docker-image quay.io/redhattraiing/gitlab-ce:8.4.3-ce.0
 oc get po/gitlab-6c5b5c5d55-gzkct -o yaml | oc adm policy scc-subject-review -f -
