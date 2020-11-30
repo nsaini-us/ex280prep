@@ -132,7 +132,7 @@ Get all the rolebindings for the current namespace<br/>
 # 6. Remove kubeadmin from the system #
 ##
 Make sure you have assigned cluster-admin to someone else before doing this! Instead of removing/deleting the user, we will remove the password from the system. <br/>
-&nbsp;&nbsp;&nbsp;&nbsp;oc delete secret kubeadmin -n kube-system
+`oc delete secret kubeadmin -n kube-system`
 
 # 7. Secrets and ConfigMaps #
 ##
