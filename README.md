@@ -41,15 +41,19 @@ Delete the other key<br/>
 `oc adm taint node node1 test-`
 
 # 4. OAuth #
-sudo yum install httpd-tools
+Install htpasswd command line utility<br/>
+`sudo yum install httpd-tools`
 
+Create a new file for htpass with users and their passwords
+```
 htpasswd -c -b /tmp/htpass user1 password1
-
 htpasswd -b /tmp/htpass user2 password2
+```
 
-oc get oauth cluster -o yaml > /tmp/oauth.yaml
+Copy existing oauth config to a file for editing<br/>
+`oc get oauth cluster -o yaml > /tmp/oauth.yaml`
 
-add httpasswd to oauth.yaml
+Add httpasswd to oauth.yaml
 ```
 spec:
   identityProviders:
@@ -60,54 +64,70 @@ spec:
       fileData:
         name: /tmp/htpass
 ```
-oc replace -f /tmp/oauth.yaml
+Create a new secret which will hold the users and password file<br/>
+`oc create secret generic htpass-secret --from-file htpasswd=/tmp/htpass -n openshift-config`
 
-oc create secret generic htpass-secret --from-file htpasswd=/tmp/htpass -n openshift-config
+Now merge/replace existing oauth with edited version<br/>
+`oc replace -f /tmp/oauth.yaml`
 
-oc get po -w -n openshift-authentication
+Watch the pods being replaced for the new config to take into affect<br/>
+`oc get po -w -n openshift-authentication`
 
-Delete user from htpass<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;htpasswd -D /tmp/htpass user2
+Lets delete user2 from htpass file<br/>
+`htpasswd -D /tmp/htpass user2`
 
 Update the secret with new htpass<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;oc set data secret/htpass-secret --from-file htpasswd=/tmp/htpass -n openshift-config
+`oc set data secret/htpass-secret --from-file htpasswd=/tmp/htpass -n openshift-config`
 
+Delete the user and identity from the system
+```
 oc delete user user2
-
 oc delete identity localusers:user2
+```
 
+delete all users and identities defined in OAuth
+```
 oc delete user --all
 oc delete identity --all
+```
 
 # 5. Users, Groups, and Authentication #
-oc __adm__ policy add-cluster-role-to-user cluster-admin user-name    #__cluster role__
+Assign cluster admin role to user<br/>
+`oc adm policy add-cluster-role-to-user cluster-admin user-name`
 
-oc policy add-role-to-user role-name user-name -n project-name        #__namespace level role__
+Assign role at project/namespace level<br/>
+`oc policy add-role-to-user role-name user-name -n project-name  `
 
-oc get clusterrolebindings -o wide |grep -E "NAME|self-provisioners"
+Get current clusterrolebindings configured for self-provisioners<br/>
+`oc get clusterrolebindings -o wide |grep -E "NAME|self-provisioners"`
 
+Describe the clusterrolebindings and clusterrole<br/>
+```
 oc describe clusterrolebindings self-provisioners
-
 oc describe clusterrole self-provisioner
+```
 
 Remove self-provisioner role from system such that authenticated users can't create projects<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;oc adm policy remove-cluster-role-from-group self-provisioner system:authenticated:oauth
+`oc adm policy remove-cluster-role-from-group self-provisioner system:authenticated:oauth`
 
 Restore self-provisioners back to cluster as original<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;oc adm policy add-cluster-role-to-group --rolebinding-name self-provisioners self-provisioner system:authenticated:oauth
+`oc adm policy add-cluster-role-to-group --rolebinding-name self-provisioners self-provisioner system:authenticated:oauth`
 
+Creating new groups
+```
 oc adm group new dev-users dev1 dev2
-
 oc adm group new qa-users qa1 qa2
+```
 
-oc policy add-role-to-group __edit__ dev-users -n namespace
-
-oc policy add-role-to-group __view__ qa-users -n namespace
-
+Assign roles at namespace/project level. You will need admin role to assign users.
+```
+oc policy add-role-to-group edit dev-users -n namespace
+oc policy add-role-to-group view qa-users -n namespace
 oc policy add-role-to-user admin user1 -n namespace
+```
 
 Get all the rolebindings for the current namespace<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;oc get rolebindings -o wide
+`oc get rolebindings -o wide`
 
 # 6. Remove kubeadmin from the system #
 ##
