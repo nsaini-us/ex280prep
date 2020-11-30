@@ -69,9 +69,11 @@ oc create secret generic htpass-secret --from-file htpasswd=/tmp/htpass -n opens
 
 oc get po -w -n openshift-authentication
 
-htpasswd -D /tmp/htpass user2 # *delete user*
+Delete user from htpass<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;htpasswd -D /tmp/htpass user2
 
-oc set data secret/htpass-secret --from-file htpasswd=/tmp/htpass -n openshift-config
+Update the secret with new htpass<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;oc set data secret/htpass-secret --from-file htpasswd=/tmp/htpass -n openshift-config
 
 oc delete user user2
 
