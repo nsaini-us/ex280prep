@@ -28,7 +28,7 @@ oc adm taint nodes node1 dedicated=foo:NoSchedule -o json --dry-run=client | jq 
 ]
 ```
 
-oc describe node node1 |grep -A2 Taint
+oc describe node node1 | grep -A2 Taint
 ```
 Taints:      dedicated=foo:NoSchedule
              test=foo:NoSchedule
