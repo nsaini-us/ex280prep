@@ -11,7 +11,7 @@ oc label node node1 env-
 
 ```
 oc patch deployment/myapp \
-        --patch '{"spec":{"template":{"spec":{"nodeSelector":{"env":"dev"}}}}}'
+   --patch '{"spec":{"template":{"spec":{"nodeSelector":{"env":"dev"}}}}}'
         
 oc adm new-project demo --node-selector "env=dev"
 oc annotate namespace demo openshift.io/node-selector "env=dev" --overwrite
