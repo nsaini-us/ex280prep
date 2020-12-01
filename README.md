@@ -68,8 +68,10 @@ spec:
         name: htpass-secret
 ```
 Create a new secret which will hold the users and password file<br/>
-`oc create secret generic htpass-secret \
-        --from-file htpasswd=/tmp/htpass -n openshift-config`
+```
+oc create secret generic htpass-secret \
+        --from-file htpasswd=/tmp/htpass -n openshift-config
+```
 
 Now merge/replace existing oauth with edited version<br/>
 `oc replace -f /tmp/oauth.yaml`
