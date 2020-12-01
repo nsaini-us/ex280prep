@@ -175,19 +175,24 @@ oc import-image php --from quay.io/quay-username/php-70-rhel7 --confirm
 Using openssl generate a private key and a public key
 ```
 openssl req -x509 -newkey rsa:2048 -nodes -keyout cert.key -out cert.crt \
-    -subj "/C=US/ST=FL/L=Tampa/O=IBM/CN=*.apps.acme.com"
+                -subj "/C=US/ST=FL/L=Tampa/O=IBM/CN=*.apps.acme.com"
 ```
 Using the key and cert create a TLS secret<br/>
 `oc create secret tls demo-certs --cert cert.crt --key cert.key`
 
 Mount the tls certs into the pod (using deployment)<br/>
-`oc set volume deployment/demo --add --type=secret --secret-name demo-tls --mount-path /usr/local/etc/ssl/certs --name tls-mount`
+```
+oc set volume deployment/demo --add --type=secret --secret-name demo-tls \
+                --mount-path /usr/local/etc/ssl/certs --name tls-mount
+```
 
 Now create a passthrough route<br/>
-`oc create route passthrough demo-https --service demo-https --port 8443 --hostname demo-https.apps.ocp4.example.com`
+`oc create route passthrough demo-https --service demo-https --port 8443 \
+                --hostname demo-https.apps.ocp4.example.com`
 
 Using edge route with same certs<br/>
-`oc expose route edge demo-https --service api-frontend --hostname api.apps.acme.com --key cert.key --cert cert.crt`
+`oc expose route edge demo-https --service api-frontend --hostname api.apps.acme.com \
+                --key cert.key --cert cert.crt`
 
 Export the router cert in case we need to use it as a ca-cert<br/>
 `oc extract secrets/router-ca --keys tls.crt -n openshift-ingress-operator --to /tmp/`
@@ -225,13 +230,15 @@ Check the node resources<br/>
 `oc describe node node1`
 
 Set resources on a deployment. Request limits are how much each request is allowed, and limit is the max allowed <br/>
-`oc set resources deployment hello-world-nginx --requests cpu=10m,memory=20Mi --limits cpu=180m,memory=100Mi`
+`oc set resources deployment hello-world-nginx \
+                --requests cpu=10m,memory=20Mi --limits cpu=180m,memory=100Mi`
 
 Quota is project level resources available<br/>
 `oc create quota dev-quota --hard services=10,cpu=1300,memory=1.5Gi`
 
 Cluster Quota is resources available across multiple projects<br/>
-`oc create clusterquota env-qa --project-annotation-selector.openshift.io/requester=qa --hard pods=12,secrets=20,services=5`
+`oc create clusterquota env-qa --project-annotation-selector.openshift.io/requester=qa \
+                --hard pods=12,secrets=20,services=5`
 
 Show all project annotations and labels<br/>
 `oc describe namespace demo`
@@ -261,7 +268,7 @@ spec:
       default:			# default that a container can use if not specified in the Pod spec
         cpu: "300m"
         memory: "200Mi"
-      defaultRequest:	# default that a container can request if not specified in the Pod spec
+      defaultRequest:	        # default that a container can request if not specified in the Pod spec
         cpu: "200m"
         memory: "100Mi"
 ```
