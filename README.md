@@ -116,8 +116,10 @@ Remove self-provisioner role from system such that authenticated users can't cre
 `oc adm policy remove-cluster-role-from-group self-provisioner system:authenticated:oauth`
 
 Restore self-provisioners back to cluster as original<br/>
-`oc adm policy add-cluster-role-to-group \
-          --rolebinding-name self-provisioners self-provisioner system:authenticated:oauth`
+```
+oc adm policy add-cluster-role-to-group \
+          --rolebinding-name self-provisioners self-provisioner system:authenticated:oauth
+```
 
 Creating new groups
 ```
