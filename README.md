@@ -168,8 +168,11 @@ oc set env deployment/mysql --prefix MYSQL_ --from secret/mysql
 To use a private image in quay.io using secrets stored in files
 ```
 podman login -u quay-username quay.io
-oc create secret generic quay-registry --from-file .dockerconfigjson=${XDG_RUNTIME_DIR}/containers/auth.json \
-    --type kubernetes.io/dockerconfigjson
+
+oc create secret generic quay-registry \
+        --from-file .dockerconfigjson=${XDG_RUNTIME_DIR}/containers/auth.json \
+        --type kubernetes.io/dockerconfigjson
+        
 oc import-image php --from quay.io/quay-username/php-70-rhel7 --confirm
 ```
 # 8. Secure Routes #
