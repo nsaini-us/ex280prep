@@ -194,7 +194,7 @@ oc import-image php --from quay.io/quay-username/php-70-rhel7 --confirm
 Using openssl generate a private key and a public key
 ```
 openssl req -x509 -newkey rsa:2048 -nodes -keyout cert.key -out cert.crt \
-                -subj "/C=US/ST=FL/L=Tampa/O=IBM/CN=*.apps.acme.com"
+                -subj "/C=US/ST=FL/L=Tampa/O=IBM/CN=*.apps.acme.com" -days 365
 ```
 Using the key and cert create a TLS secret<br/>
 `oc create secret tls demo-certs --cert cert.crt --key cert.key`
