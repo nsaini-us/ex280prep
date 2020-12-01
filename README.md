@@ -133,6 +133,7 @@ Get all the rolebindings for the current namespace<br/>
 ##
 Make sure you have assigned cluster-admin to someone else before doing this!<br/>
 `oc adm policy add-cluster-role-to-user cluster-admin user-name`
+
 Instead of removing/deleting the user, we will remove the password from the system. <br/>
 `oc delete secret kubeadmin -n kube-system`
 
@@ -318,3 +319,25 @@ oc new-app --binary --image-stream nodejs --name nodejs
 oc start-build nodejs --from-dir . --follow
 oc expose svc/nodejs
 ```
+
+# 14. General Troubleshooting #
+##
+Following are high level issues that are highlighted in the course
++ Limits or Quotas are exceeded
++ Taints on node (NoSchedule)
++ Route is misconfigured
++ Permissions missing, assign SA to deployment
+
+Useful commands.
+```
+oc logs pod-name
+oc adm top pods
+oc adm top nodes
+oc get events --field-selector type=Warning
+oc debug pod
+oc debug node/nodename
+oc adm taint node node-name key-
+```
+
+After fixing the deployment (yaml or the issue at hand), the deployment might have timed out by the time the issue was fixed. In order to push the deployment a new "rollout" might be needed. <br/>
+`oc rollout latest dc/demo`
