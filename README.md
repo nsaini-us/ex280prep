@@ -12,10 +12,13 @@ oc label node node1 env-
 ```
 oc patch deployment/myapp \
         --patch '{"spec":{"template":{"spec":{"nodeSelector":{"env":"dev"}}}}}'
+        
 oc adm new-project demo --node-selector "env=dev"
+
 oc annotate namespace demo openshift.io/node-selector "env=dev" --overwrite
+
 oc patch namespace demo \
-        --patch '{"metadata":{"annotations":{"openshift.io/node-selector": "env=dev"}}}'
+   --patch '{"metadata":{"annotations":{"openshift.io/node-selector": "env=dev"}}}'
 ```
 # 3. Taints #
 
@@ -115,12 +118,14 @@ oc describe clusterrole self-provisioner
 ```
 
 Remove self-provisioner role from system such that authenticated users can't create projects<br/>
-`oc adm policy remove-cluster-role-from-group self-provisioner system:authenticated:oauth`
+```
+oc adm policy remove-cluster-role-from-group self-provisioner system:authenticated:oauth
+```
 
 Restore self-provisioners back to cluster as original<br/>
 ```
 oc adm policy add-cluster-role-to-group \
-          --rolebinding-name self-provisioners self-provisioner system:authenticated:oauth
+  --rolebinding-name self-provisioners self-provisioner system:authenticated:oauth
 ```
 
 Creating new groups
@@ -164,8 +169,11 @@ oc set volume deployment/demo --add --type secret --secret-name demo-secret \
 
 Example of setting env variables that contain sensitive data
 ```
-oc create secret generic mysql --from-literal user=dba --from-literal password=redhat123 \
-        --from-literal database=test --from-literal hostname=mysql
+oc create secret generic mysql \
+        --from-literal user=dba \
+        --from-literal password=redhat123 \
+        --from-literal database=test \
+        --from-literal hostname=mysql
 
 oc new-app --name mysql \
         --docker-image registry.access.redhat.com/rhscl/mysql-57-rhel7:5.7-47
@@ -256,7 +264,8 @@ Quota is project level resources available<br/>
 
 Cluster Quota is resources available across multiple projects<br/>
 ```
-oc create clusterquota env-qa --project-annotation-selector.openshift.io/requester=qa \
+oc create clusterquota env-qa \
+                --project-annotation-selector.openshift.io/requester=qa \
                 --hard pods=12,secrets=20,services=5
 ```
 
@@ -285,10 +294,10 @@ spec:
       min:
         cpu: "100m"
         memory: "4Mi"
-      default:			# default that a container can use if not specified in the Pod spec
+      default:			# default if not specified in the Pod spec
         cpu: "300m"
         memory: "200Mi"
-      defaultRequest:	        # default that a container can request if not specified in the Pod spec
+      defaultRequest:	        # default request if not specified in the Pod spec
         cpu: "200m"
         memory: "100Mi"
 ```
@@ -329,11 +338,18 @@ oc get is -n openshift | grep httpd
 ```
 
 ```
-oc new-app --name nms --docker-image image-registry.openshift-image-registry.svc:5000/openshift/httpd:latest
-      OR
-oc new-app --name nms image-registry.openshift-image-registry.svc:5000/openshift/httpd:latest
-      OR
-oc new-app --name nms --image image-registry.openshift-image-registry.svc:5000/openshift/httpd:latest
+oc new-app --name nms \
+        --docker-image image-registry.openshift-image-registry.svc:5000/openshift/httpd:latest
+
+OR
+
+oc new-app --name nms \
+        image-registry.openshift-image-registry.svc:5000/openshift/httpd:latest
+
+OR
+
+oc new-app --name nms \
+        --image image-registry.openshift-image-registry.svc:5000/openshift/httpd:latest
 ```
 Create a service<br/>
 `oc expose deployment/nms --port 8080 --target-port 8080`
