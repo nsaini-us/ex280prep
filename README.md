@@ -367,3 +367,5 @@ oc adm taint node node-name key-
 After fixing the deployment (yaml or the issue at hand), the deployment might have timed out by the time the issue was fixed. In order to push the deployment a new "rollout" might be needed. <br/>
 
 `oc rollout latest dc/demo`
+
+An example app was deployed where the endpoint wasn't working. After troubleshooting it was found the name of the service was defined with app tagname was mis spelled. Had to fix the typo to get the service working again. Another case was where instead of Route an Ingress with the wrong hostname was defined. When you delete the route, the route was re-created by openshift with a different route-name but still having the wrong hostname. To fix, we had to edit the Ingress configuration with the correct hostname. Once that was done, the correct route was generated and started working!
