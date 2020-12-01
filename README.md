@@ -1,5 +1,5 @@
 # 1. Labels #
-##
+
 ```
 oc label node node1 env=dev 
 oc label node node2 env=prod
@@ -8,15 +8,17 @@ oc get nodes --show-labels
 oc label node node1 env-
 ```
 # 2. Node Selector #
-##
+
 ```
-oc patch deployment/myapp --patch '{"spec":{"template":{"spec":{"nodeSelector":{"env":"dev"}}}}}'
+oc patch deployment/myapp \
+        --patch '{"spec":{"template":{"spec":{"nodeSelector":{"env":"dev"}}}}}'
 oc adm new-project demo --node-selector "env=dev"
 oc annotate namespace demo openshift.io/node-selector "env=dev" --overwrite
-oc patch namespace demo --patch '{"metadata":{"annotations":{"openshift.io/node-selector": "env=dev"}}}'
+oc patch namespace demo \
+        --patch '{"metadata":{"annotations":{"openshift.io/node-selector": "env=dev"}}}'
 ```
 # 3. Taints #
-##
+
 oc adm taint nodes node1 dedicated=foo:NoSchedule -o json --dry-run=client | jq .spec.taints
 ```
 [
@@ -41,6 +43,7 @@ Delete the other key<br/>
 `oc adm taint node node1 test-`
 
 # 4. OAuth #
+
 Install htpasswd command line utility<br/>
 `sudo yum install httpd-tools`
 
@@ -65,7 +68,8 @@ spec:
         name: htpass-secret
 ```
 Create a new secret which will hold the users and password file<br/>
-`oc create secret generic htpass-secret --from-file htpasswd=/tmp/htpass -n openshift-config`
+`oc create secret generic htpass-secret \
+        --from-file htpasswd=/tmp/htpass -n openshift-config`
 
 Now merge/replace existing oauth with edited version<br/>
 `oc replace -f /tmp/oauth.yaml`
@@ -92,6 +96,7 @@ oc delete identity --all
 ```
 
 # 5. Users, Groups, and Authentication #
+
 Assign cluster admin role to user<br/>
 `oc adm policy add-cluster-role-to-user cluster-admin user-name`
 
@@ -111,7 +116,8 @@ Remove self-provisioner role from system such that authenticated users can't cre
 `oc adm policy remove-cluster-role-from-group self-provisioner system:authenticated:oauth`
 
 Restore self-provisioners back to cluster as original<br/>
-`oc adm policy add-cluster-role-to-group --rolebinding-name self-provisioners self-provisioner system:authenticated:oauth`
+`oc adm policy add-cluster-role-to-group \
+          --rolebinding-name self-provisioners self-provisioner system:authenticated:oauth`
 
 Creating new groups
 ```
@@ -130,7 +136,7 @@ Get all the rolebindings for the current namespace<br/>
 `oc get rolebindings -o wide`
 
 # 6. Remove kubeadmin from the system #
-##
+
 Make sure you have assigned cluster-admin to someone else before doing this!<br/>
 `oc adm policy add-cluster-role-to-user cluster-admin user-name`
 
@@ -138,7 +144,7 @@ Instead of removing/deleting the user, we will remove the password from the syst
 `oc delete secret kubeadmin -n kube-system`
 
 # 7. Secrets and ConfigMaps #
-##
+
 Create secrets from literals and apply to a deployment
 ```
 oc create secret generic secretname --from-literal key1=value1 --from-literal key2=value2
@@ -163,7 +169,7 @@ oc create secret generic quay-registry --from-file .dockerconfigjson=${XDG_RUNTI
 oc import-image php --from quay.io/quay-username/php-70-rhel7 --confirm
 ```
 # 8. Secure Routes #
-##
+
 Using openssl generate a private key and a public key
 ```
 openssl req -x509 -newkey rsa:2048 -nodes -keyout cert.key -out cert.crt \
@@ -185,7 +191,7 @@ Export the router cert in case we need to use it as a ca-cert<br/>
 `oc extract secrets/router-ca --keys tls.crt -n openshift-ingress-operator --to /tmp/`
 
 # 9. Security Contexts (SCC) and ServiceAccounts #
-##
+
 Get the current SCC roles defined<br/>
 `oc get scc`
 
@@ -212,7 +218,7 @@ oc set sa deployment/gitlab gitlab-sa
 ```
 
 # 10. Limits, Quotas, and LimitRanges #
-##
+
 Check the node resources<br/>
 `oc describe node node1`
 
@@ -272,7 +278,7 @@ Container   memory    4Mi   1Gi  100Mi            200Mi          -
 
 ```
 # 11. Scaling and AutoScaler #
-##
+
 oc scale --replicas 3 deployment/demo
 
 oc autoscale dc/demo --min 1 --max 10 --cpu-percent 80
@@ -280,7 +286,7 @@ oc autoscale dc/demo --min 1 --max 10 --cpu-percent 80
 oc get hpa
 
 # 12. Image Registry #
-##
+
 Built in registry is housed in openshift-image-registry namespace<br/>
 `oc -n openshift-image-registry get svc`
 
@@ -304,7 +310,7 @@ Create a service<br/>
 `oc expose deployment/nms --port 8080 --target-port 8080`
 
 # 13. Deployment Strategy #
-##
+
 Using a docker strategy using local build directory
 ```
 oc new-app --strategy docker --binary --name myapp
@@ -321,7 +327,7 @@ oc expose svc/nodejs
 ```
 
 # 14. General Troubleshooting #
-##
+
 Following are high level issues that are highlighted in the course
 + Limits or Quotas are exceeded
 + Taints on node (NoSchedule)
@@ -340,4 +346,5 @@ oc adm taint node node-name key-
 ```
 
 After fixing the deployment (yaml or the issue at hand), the deployment might have timed out by the time the issue was fixed. In order to push the deployment a new "rollout" might be needed. <br/>
+
 `oc rollout latest dc/demo`
