@@ -14,9 +14,7 @@ oc patch deployment/myapp \
         --patch '{"spec":{"template":{"spec":{"nodeSelector":{"env":"dev"}}}}}'
         
 oc adm new-project demo --node-selector "env=dev"
-
 oc annotate namespace demo openshift.io/node-selector "env=dev" --overwrite
-
 oc patch namespace demo \
    --patch '{"metadata":{"annotations":{"openshift.io/node-selector": "env=dev"}}}'
 ```
@@ -119,7 +117,8 @@ oc describe clusterrole self-provisioner
 
 Remove self-provisioner role from system such that authenticated users can't create projects<br/>
 ```
-oc adm policy remove-cluster-role-from-group self-provisioner system:authenticated:oauth
+oc adm policy remove-cluster-role-from-group self-provisioner \
+  system:authenticated:oauth
 ```
 
 Restore self-provisioners back to cluster as original<br/>
@@ -184,10 +183,10 @@ To use a private image in quay.io using secrets stored in files
 ```
 podman login -u quay-username quay.io
 
-oc create secret generic quay-registry \
+oc create secret generic quayio \
         --from-file .dockerconfigjson=${XDG_RUNTIME_DIR}/containers/auth.json \
         --type kubernetes.io/dockerconfigjson
-        
+oc secrets link default quayio --for pull        
 oc import-image php --from quay.io/quay-username/php-70-rhel7 --confirm
 ```
 # 8. Secure Routes #
@@ -338,18 +337,18 @@ oc get is -n openshift | grep httpd
 ```
 
 ```
-oc new-app --name nms \
-        --docker-image image-registry.openshift-image-registry.svc:5000/openshift/httpd:latest
+oc new-app --name nms --docker-image \
+   image-registry.openshift-image-registry.svc:5000/openshift/httpd:latest
 
 OR
 
 oc new-app --name nms \
-        image-registry.openshift-image-registry.svc:5000/openshift/httpd:latest
+   image-registry.openshift-image-registry.svc:5000/openshift/httpd:latest
 
 OR
 
-oc new-app --name nms \
-        --image image-registry.openshift-image-registry.svc:5000/openshift/httpd:latest
+oc new-app --name nms --image \
+   image-registry.openshift-image-registry.svc:5000/openshift/httpd:latest
 ```
 Create a service<br/>
 `oc expose deployment/nms --port 8080 --target-port 8080`
@@ -394,4 +393,6 @@ After fixing the deployment (yaml or the issue at hand), the deployment might ha
 
 `oc rollout latest dc/demo`
 
-An example app was deployed where the endpoint wasn't working. After troubleshooting it was found the name of the service was defined with app tagname was mis spelled. Had to fix the typo to get the service working again. Another case was where instead of Route an Ingress with the wrong hostname was defined. When you delete the route, the route was re-created by openshift with a different route-name but still having the wrong hostname. To fix, we had to edit the Ingress configuration with the correct hostname. Once that was done, the correct route was generated and started working!
+An example app was deployed where the endpoint wasn't working. After troubleshooting it was found the name of the service was defined with app tagname was mis spelled. Had to fix the typo to get the service working again. 
+
+Another case was where instead of Route an Ingress with the wrong hostname was defined. When you delete the route, the route was re-created by openshift with a different route-name but still having the wrong hostname. To fix, we had to edit the Ingress configuration with the correct hostname. Once that was done, the correct route was generated and started working!
