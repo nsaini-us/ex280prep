@@ -62,7 +62,7 @@ spec:
     mappingMethod: claim
     htpasswd:
       fileData:
-        name: /tmp/htpass
+        name: htpass-secret
 ```
 Create a new secret which will hold the users and password file<br/>
 `oc create secret generic htpass-secret --from-file htpasswd=/tmp/htpass -n openshift-config`
@@ -131,7 +131,9 @@ Get all the rolebindings for the current namespace<br/>
 
 # 6. Remove kubeadmin from the system #
 ##
-Make sure you have assigned cluster-admin to someone else before doing this! Instead of removing/deleting the user, we will remove the password from the system. <br/>
+Make sure you have assigned cluster-admin to someone else before doing this!<br/>
+`oc adm policy add-cluster-role-to-user cluster-admin user-name`
+Instead of removing/deleting the user, we will remove the password from the system. <br/>
 `oc delete secret kubeadmin -n kube-system`
 
 # 7. Secrets and ConfigMaps #
@@ -221,6 +223,9 @@ Quota is project level resources available<br/>
 
 Cluster Quota is resources available across multiple projects<br/>
 `oc create clusterquota env-qa --project-annotation-selector.openshift.io/requester=qa --hard pods=12,secrets=20,services=5`
+
+Show all project annotations and labels<br/>
+`oc describe namespace demo`
 
 Limit ranges in a yaml file are defined as follows
 ```
