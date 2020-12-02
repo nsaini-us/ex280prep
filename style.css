@@ -1,0 +1,22 @@
+<style>
+ h1 {
+    color: blue;
+    font-size: 18pt;
+    margin-bottom: 16pt;
+    margin-top: 16pt;
+  }
+  * {
+    line-height: 21px;
+    margin-block-start: 0px;
+    margin-block-end: 15px;
+    margin: 0 0 15px;
+    overflow-wrap: break-word;
+  }
+code {
+    font-family: "Fira Mono","Consolas","Monaco";
+    font-size: 8pt;
+    color: brown;
+    background: pink;
+    padding: 4pt;
+  }
+</style>
