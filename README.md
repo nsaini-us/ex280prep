@@ -114,6 +114,8 @@ Describe the clusterrolebindings and clusterrole<br/>
 oc describe clusterrolebindings self-provisioners
 oc describe clusterrole self-provisioner
 ```
+> **clusterrolebindings = self-provisioners**<br/>
+> **clusterrole = self-provisioner**
 
 Remove self-provisioner role from system such that authenticated users can't create projects<br/>
 ```
