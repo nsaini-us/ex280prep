@@ -339,7 +339,6 @@ Probes have the following configuration settings:
 Examples of setting probes:
 ```
 oc set probe dc/demo --readiness --initial-delay-seconds 20
-oc set probe dc/demo --remove --readiness --liveness
 
 oc set probe dc/webapp --readiness --get-url=http://:8080/healthz \
    --period-seconds 10 --timeout-seconds 1 --initial-delay-seconds 30
@@ -371,6 +370,9 @@ oc set probe dc/mq --liveness --open-tcp 1414 --period-seconds 3 --timeout-secon
   "failureThreshold": 3
 }
 ```
+
+Removing probes:
+`oc set probe dc/demo --remove --readiness --liveness`
 
 # 13. Image Registry #
 
