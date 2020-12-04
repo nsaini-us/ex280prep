@@ -358,6 +358,18 @@ oc set probe dc/ace --liveness --get-url http://:7600/healthz --initial-delay-se
   "initialDelaySeconds": 30,
   "periodSeconds": 10
 }
+
+oc set probe dc/mq --liveness --open-tcp 1414 --period-seconds 3 --timeout-seconds 2 --failure-threshold 3 \
+      --initial-delay-seconds 30 --dry-run=client -o json | jq .spec.template.spec.containers[].livenessProbe
+{
+  "tcpSocket": {
+    "port": 1414
+  },
+  "initialDelaySeconds": 30,
+  "timeoutSeconds": 2,
+  "periodSeconds": 3,
+  "failureThreshold": 3
+}
 ```
 
 # 13. Image Registry #
