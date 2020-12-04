@@ -353,7 +353,7 @@ oc set probe dc/mq --liveness --open-tcp 1414 --period-seconds 3 \
 Built in registry is housed in openshift-image-registry namespace<br/>
 `oc -n openshift-image-registry get svc`
 
-cluster wide svc nameing scheme is service-name.namespace.svc<br/>
+cluster wide svc naming scheme is service-name.namespace.svc<br/>
 `image-registry.openshift-image-registry.svc`
 
 using stored images from openshift project
