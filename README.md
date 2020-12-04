@@ -330,11 +330,11 @@ oc get hpa
 - Liveness: Probe to test if container is in healthy state? If probe fails, Openshift kills the conatiner and redeploys.
 
 Probes have the following configuration settings:
-- initialDelaySeconds: required, default value=0, how long to wait to start the probe after container starts
-- timeoutSeconds: required, default value=1, how long to wait for the probe to finish
-- periodSeconds: not required, default value=1, how often to probe
-- successThreshold: not required, default value=1, min consecutive successes after failure to consider success
-- failureThreshold: not required, default value=3, min consecutive failures to be considered a failure
+- __initialDelaySeconds__: required, default value=0, how long to wait to start the probe after container starts
+- __timeoutSeconds__: required, default value=1, how long to wait for the probe to finish
+- __periodSeconds__: not required, default value=1, how often to probe
+- __successThreshold__: not required, default value=1, min consecutive successes after failure to consider success
+- __failureThreshold__: not required, default value=3, min consecutive failures to be considered a failure
 
 Examples of setting probes:
 ```
