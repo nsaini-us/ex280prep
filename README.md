@@ -20,7 +20,7 @@ oc patch namespace demo \
 ```
 # 3. Taints #
 
-oc adm taint nodes node1 dedicated=foo:NoSchedule -o json --dry-run=client | jq .spec.taints
+`oc adm taint nodes node1 dedicated=foo:NoSchedule -o json --dry-run=client | jq .spec.taints`
 ```
 [
   {
@@ -346,6 +346,19 @@ oc set probe dc/webapp --readiness --get-url=http://:8080/healthz \
 
 oc set probe dc/mq --liveness --open-tcp 1414 --period-seconds 3 \
    --timeout-seconds 2 --failure-threshold 3 --initial-delay-seconds 30
+```
+`oc set probe dc/ace --liveness --get-url http://:7600/healthz --initial-delay-seconds 30 \`<br/>
+`     --period-seconds 10 --dry-run -o json | jq .spec.template.spec.containers[].livenessProbe`
+```
+{
+  "httpGet": {
+    "path": "/healthz",
+    "port": 7600,
+    "scheme": "HTTP"
+  },
+  "initialDelaySeconds": 30,
+  "periodSeconds": 10
+}
 ```
 
 # 13. Image Registry #
