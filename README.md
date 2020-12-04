@@ -324,7 +324,31 @@ oc autoscale dc/demo --min 1 --max 10 --cpu-percent 80
 
 oc get hpa
 
-# 12. Image Registry #
+# 12. Readiness and Liveness #
+
+- Readiness: How long before container is ready to serve requests. If probe fails Openshift removes the IP from the services endpoints, such that no traffic is forwarded to the container.
+- Liveness: Probe to test if container is in healthy state? If probe fails, Openshift kills the conatiner and redeploys.
+
+Probes have the following configuration settings:
+- initialDelaySeconds: required, default value=0, how long to wait to start the probe after container starts
+- timeoutSeconds: required, default value=1, how long to wait for the probe to finish
+- periodSeconds: not required, default value=1, how often to probe
+- successThreshold: not required, default value=1, min consecutive successes after failure to consider success
+- failureThreshold: not required, default value=3, min consecutive failures to be considered a failure
+
+Examples of setting probes:
+```
+oc set probe dc/demo --readiness --initial-delay-seconds 20
+oc set probe dc/demo --remove --readiness --liveness
+
+oc set probe dc/webapp --readiness --get-url=http://:8080/healthz \
+   --period-seconds 10 --timeout-seconds 1 --initial-delay-seconds 30
+
+oc set probe dc/mq --liveness --open-tcp 1414 --period-seconds 3 \
+   --timeout-seconds 2 --failure-threshold 3 --initial-delay-seconds 30
+```
+
+# 13. Image Registry #
 
 Built in registry is housed in openshift-image-registry namespace<br/>
 `oc -n openshift-image-registry get svc`
@@ -355,7 +379,7 @@ oc new-app --name nms --image \
 Create a service<br/>
 `oc expose deployment/nms --port 8080 --target-port 8080`
 
-# 13. Deployment Strategy #
+# 14. Deployment Strategy #
 
 Using a docker strategy using local build directory
 ```
@@ -372,7 +396,7 @@ oc start-build nodejs --from-dir . --follow
 oc expose svc/nodejs
 ```
 
-# 14. General Troubleshooting #
+# 15. General Troubleshooting #
 
 Following are high level issues that are highlighted in the course
 + Limits or Quotas are exceeded
