@@ -371,7 +371,7 @@ oc set probe dc/mq --liveness --open-tcp 1414 --period-seconds 3 --timeout-secon
 }
 ```
 
-Removing probes:
+Removing probes:<br/>
 `oc set probe dc/demo --remove --readiness --liveness`
 
 # 13. Image Registry #
