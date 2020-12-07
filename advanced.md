@@ -1,4 +1,4 @@
-# Upgrade Cluster on a newer Channel #
+# Upgrade Cluster to a newer Channel #
 
 Downgrading is not supported! So be very careful if you decide to do this!
 
