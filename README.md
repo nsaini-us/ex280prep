@@ -50,7 +50,7 @@ delete the other key<br/>
 Install htpasswd command line utility<br/>
 `sudo yum install httpd-tools`
 
-Create a new file for htpass with users and their passwords
+Create a new file for htpass with users and their passwords<br/>
 `htpasswd -c -b /tmp/htpass user1 password1` <br/>
 `htpasswd -b /tmp/htpass user2 password2`
 
@@ -88,7 +88,7 @@ delete the user and identity from the system
 `oc delete user user2` <br/>
 `oc delete identity localusers:user2`
 
-delete all users and identities defined in OAuth
+delete all users and identities defined in OAuth<br/>
 `oc delete user --all` <br/>
 `oc delete identity --all`
 
@@ -118,11 +118,11 @@ Restore self-provisioners back to cluster as original<br/>
 `oc adm policy add-cluster-role-to-group \` <br/>
 &nbsp;&nbsp;`--rolebinding-name self-provisioners self-provisioner system:authenticated:oauth`
 
-Creating new groups
+Creating new groups<br/>
 `oc adm group new dev-users dev1 dev2` <br/>
 `oc adm group new qa-users qa1 qa2`
 
-Assign roles at namespace/project level. You will need admin role to assign users.
+Assign roles at namespace/project level. You will need admin role to assign users.<br/>
 `oc policy add-role-to-group edit dev-users -n namespace` <br/>
 `oc policy add-role-to-group view qa-users -n namespace` <br/>
 `oc policy add-role-to-user admin user1 -n namespace`
@@ -140,7 +140,7 @@ Instead of removing/deleting the user, we will remove the password from the syst
 
 # 7. Secrets and ConfigMaps #
 
-Create secrets from literals and apply to a deployment
+Create secrets from literals and apply to a deployment<br/>
 `oc create secret generic secretname --from-literal key1=value1 \` <br/>
 &nbsp;&nbsp;`--from-literal key2=value2` <br/>
 `oc set env deployment/hello --from secret/secretname`
@@ -149,7 +149,7 @@ Mount the secret file into the pod filesystem<br/>
 `oc set volume deployment/demo --add --type secret --secret-name demo-secret \` <br/>
  &nbsp;&nbsp;`--mount-path /app-secrets`
 
-Example of setting env variables that contain sensitive data
+Example of setting env variables that contain sensitive data<br/>
 `oc create secret generic mysql \` <br/>
  &nbsp;&nbsp;`--from-literal user=dba \` <br/>
  &nbsp;&nbsp;`--from-literal password=redhat123 \` <br/>
@@ -161,7 +161,7 @@ Example of setting env variables that contain sensitive data
 
 `oc set env deployment/mysql --prefix MYSQL_ --from secret/mysql`
 
-To use a private image in quay.io using secrets stored in files
+To use a private image in quay.io using secrets stored in files<br/>
 `podman login -u quay-username quay.io`
 
 `oc create secret generic quayio \` <br/>
@@ -174,7 +174,7 @@ To use a private image in quay.io using secrets stored in files
 
 # 8. Secure Routes #
 
-Using openssl generate a private key and a public key
+Using openssl generate a private key and a public key <br/>
 `openssl req -x509 -newkey rsa:2048 -nodes -keyout cert.key -out cert.crt \` <br/>
 &nbsp;&nbsp;`-subj "/C=US/ST=FL/L=Tampa/O=IBM/CN=*.apps.acme.com" -days 365`
 
@@ -204,20 +204,20 @@ Get the current SCC roles defined<br/>
 Get details of scc anyuid<br/>
 `oc describe scc anyuid`
 
-Create a service account in the current project and assign the anyuid priviledges to the service account.
+Create a service account in the current project and assign the anyuid priviledges to the service account. <br/>
 `oc create serviceaccount svc-name` <br/>
 `oc adm policy add-scc-to-user anyuid -z svc-name -n namespace` <br/>
-`oc set serviceaccount deployment/demo svc-name` <br/>
+`oc set serviceaccount deployment/demo svc-name`
 
 review the scc priviledges needed for a pod<br/>
 `oc get po/podname-756ff-9cjbj -o yaml | oc adm policy scc-subject-review -f -`
 
-Example of gitlab being run as anyuid using serviceaccount
+Example of gitlab being run as anyuid using serviceaccount <br/>
 `oc new-app --name gitlab --docker-image quay.io/redhattraiing/gitlab-ce:8.4.3-ce.0` <br/>
 `oc get po/gitlab-6c5b5c5d55-gzkct -o yaml | oc adm policy scc-subject-review -f -` <br/>
 `oc create sa gitlab-sa` <br/>
 `oc adm policy add-scc-to-user anyuid -z gitlab-sa` <br/>
-`oc set sa deployment/gitlab gitlab-sa` <br/>
+`oc set sa deployment/gitlab gitlab-sa`
 
 # 10. Limits, Quotas, and LimitRanges #
 
