@@ -404,8 +404,8 @@ oc adm taint node node-name key-
 ```
 
 Connect to a service using a debug image<br/>
-`oc get svc/mysql -o jsonpath="{.spec.clusterIP}{'\n'}"`
-`oc debug -t deployment/app --image registry.access.redhat.com/ubi8/ubi:8.0`
+`oc get svc/mysql -o jsonpath="{.spec.clusterIP}{'\n'}"` <br/>
+`oc debug -t deployment/app --image registry.access.redhat.com/ubi8/ubi:8.0` <br/>
 `curl -v telnet://<clusterIP-from-above>:<port-number>`
 
 After fixing the deployment (yaml or the issue at hand), the deployment might have timed out by the time the issue was fixed. In order to push the deployment a new "rollout" might be needed. <br/>
