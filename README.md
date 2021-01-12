@@ -327,11 +327,11 @@ Examples of setting probes:
 
 `oc set probe dc/demo --readiness --initial-delay-seconds 20`
 
-`oc set probe dc/webapp --readiness --get-url=http://:8080/healthz \`
+`oc set probe dc/webapp --readiness --get-url=http://:8080/healthz \` <br/>
 &nbsp;&nbsp;`--period-seconds 10 --timeout-seconds 1 --initial-delay-seconds 30`
 
-`oc set probe dc/mq --liveness --open-tcp 1414 --period-seconds 3 \`
-`--timeout-seconds 2 --failure-threshold 3 --initial-delay-seconds 30`
+`oc set probe dc/mq --liveness --open-tcp 1414 --period-seconds 3 \` <br/>
+&nbsp;&nbsp;`--timeout-seconds 2 --failure-threshold 3 --initial-delay-seconds 30`
 
 `oc set probe dc/ace --liveness --get-url http://:7600/healthz \` <br/>
 &nbsp;&nbsp;`--initial-delay-seconds 30 --period-seconds 10 --dry-run=client -o json | \` <br/>
@@ -349,7 +349,7 @@ Examples of setting probes:
 ```
 `oc set probe dc/mq --liveness --open-tcp 1414 --period-seconds 3 \` <br/>
 &nbsp;&nbsp;`--timeout-seconds 2 --failure-threshold 3 --initial-delay-seconds 30 \` <br/>
-&nbsp;&nbsp;`-dry-run=client -o json | jq .spec.template.spec.containers[].livenessProbe`
+&nbsp;&nbsp;&nbsp;&nbsp;`--dry-run=client -o json | jq .spec.template.spec.containers[].livenessProbe`
 ```
 {
   "tcpSocket": {
@@ -374,24 +374,22 @@ cluster wide svc naming scheme is service-name.namespace.svc<br/>
 `image-registry.openshift-image-registry.svc`
 
 using stored images from openshift project
-```
-oc get images
-oc get is -n openshift | grep httpd
-```
 
-```
-oc new-app --name nms --docker-image \
-   image-registry.openshift-image-registry.svc:5000/openshift/httpd:latest
+`oc get images` <br/>
+`oc get is -n openshift | grep httpd`
+
+`oc new-app --name nms --docker-image \` <br/>
+&nbsp;&nbsp;`image-registry.openshift-image-registry.svc:5000/openshift/httpd:latest`
 
 OR
 
-oc new-app --name nms \
-   image-registry.openshift-image-registry.svc:5000/openshift/httpd:latest
+`oc new-app --name nms \` <br/>
+&nbsp;&nbsp;`image-registry.openshift-image-registry.svc:5000/openshift/httpd:latest`
 
 OR
 
-oc new-app --name nms --image \
-   image-registry.openshift-image-registry.svc:5000/openshift/httpd:latest
+`oc new-app --name nms --image \` <br/>
+&nbsp;&nbsp;`image-registry.openshift-image-registry.svc:5000/openshift/httpd:latest`
 ```
 Create a service<br/>
 `oc expose deployment/nms --port 8080 --target-port 8080`
@@ -399,19 +397,18 @@ Create a service<br/>
 # 14. Deployment Strategy #
 
 Using a docker strategy using local build directory
-```
-oc new-app --strategy docker --binary --name myapp
-oc start-build myapp --from-dir . --follow
-oc expose deployment myapp --target-port 8080 --port 80
-oc expose svc myapp
-```
+
+`oc new-app --strategy docker --binary --name myapp` <br/>
+`oc start-build myapp --from-dir . --follow` <br/>
+`oc expose deployment myapp --target-port 8080 --port 80` <br/?
+`oc expose svc myapp`
 
 Using a nodejs builder
-```
-oc new-app --binary --image-stream nodejs --name nodejs
-oc start-build nodejs --from-dir . --follow
-oc expose svc/nodejs
-```
+
+`oc new-app --binary --image-stream nodejs --name nodejs` <br/>
+`oc start-build nodejs --from-dir . --follow` <br/>
+`oc expose svc/nodejs`
+
 
 # 15. General Troubleshooting #
 
