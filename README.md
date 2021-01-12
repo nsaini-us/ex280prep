@@ -1,26 +1,26 @@
 # 1. Labels #
 
-```
-oc label node node1 env=dev 
-oc label node node2 env=prod
-oc label node node1 env=test --overwrite
-oc get nodes --show-labels
-oc label node node1 env-
-```
+`oc label node node1 env=dev` <br/>
+`oc label node node2 env=prod` <br/>
+`oc label node node1 env=test --overwrite` <br/>
+`oc get nodes --show-labels` <br/>
+`oc label node node1 env-` <br/>
+
 # 2. Node Selector #
 
-```
-oc patch deployment/myapp \
-   --patch '{"spec":{"template":{"spec":{"nodeSelector":{"env":"dev"}}}}}'
+`oc patch deployment/myapp \` <br/>
+&nbsp;&nbsp;`--patch '{"spec":{"template":{"spec":{"nodeSelector":{"env":"dev"}}}}}'`
         
-oc adm new-project demo --node-selector "env=dev"
-oc annotate namespace demo openshift.io/node-selector "env=dev" --overwrite
-oc patch namespace demo \
-   --patch '{"metadata":{"annotations":{"openshift.io/node-selector": "env=dev"}}}'
-```
+`oc adm new-project demo --node-selector "env=dev"` <br/>
+`oc annotate namespace demo openshift.io/node-selector "env=dev" --overwrite` <br/>
+`oc patch namespace demo \` <br/>
+&nbsp;&nbsp;`--patch '{"metadata":{"annotations":{"openshift.io/node-selector": "env=dev"}}}'`
+
 # 3. Taints #
 
-`oc adm taint nodes node1 dedicated=foo:NoSchedule -o json --dry-run=client | jq .spec.taints`
+`oc adm taint nodes node1 dedicated=foo:NoSchedule -o json --dry-run=client |\` <br/>
+&nbsp;&nbsp;`jq .spec.taints`
+
 ```
 [
   {
@@ -31,7 +31,8 @@ oc patch namespace demo \
 ]
 ```
 
-oc describe node node1 | grep -A2 Taint
+`oc describe node node1 | grep -A2 Taint`
+
 ```
 Taints:      dedicated=foo:NoSchedule
              test=foo:NoSchedule
@@ -49,10 +50,9 @@ Install htpasswd command line utility<br/>
 `sudo yum install httpd-tools`
 
 Create a new file for htpass with users and their passwords
-```
-htpasswd -c -b /tmp/htpass user1 password1
-htpasswd -b /tmp/htpass user2 password2
-```
+
+`htpasswd -c -b /tmp/htpass user1 password1` <br/>
+`htpasswd -b /tmp/htpass user2 password2`
 
 Copy existing oauth config to a file for editing<br/>
 `oc get oauth cluster -o yaml > /tmp/oauth.yaml`
@@ -69,10 +69,9 @@ spec:
         name: htpass-secret
 ```
 Create a new secret which will hold the users and password file<br/>
-```
-oc create secret generic htpass-secret \
-        --from-file htpasswd=/tmp/htpass -n openshift-config
-```
+
+`oc create secret generic htpass-secret \` <br/>
+&nbsp;&nbsp;`--from-file htpasswd=/tmp/htpass -n openshift-config`
 
 Now merge/replace existing oauth with edited version<br/>
 `oc replace -f /tmp/oauth.yaml`
@@ -87,16 +86,14 @@ Update the secret with new htpass<br/>
 `oc set data secret/htpass-secret --from-file htpasswd=/tmp/htpass -n openshift-config`
 
 Delete the user and identity from the system
-```
-oc delete user user2
-oc delete identity localusers:user2
-```
+
+`oc delete user user2` <br/>
+`oc delete identity localusers:user2`
 
 delete all users and identities defined in OAuth
-```
-oc delete user --all
-oc delete identity --all
-```
+
+`oc delete user --all` <br/>
+`oc delete identity --all`
 
 # 5. Users, Groups, and Authentication #
 
@@ -110,37 +107,33 @@ Get current clusterrolebindings configured for self-provisioners<br/>
 `oc get clusterrolebindings -o wide |grep -E "NAME|self-provisioners"`
 
 Describe the clusterrolebindings and clusterrole<br/>
-```
-oc describe clusterrolebindings self-provisioners
-oc describe clusterrole self-provisioner
-```
+
+`oc describe clusterrolebindings self-provisioners` <br/>
+`oc describe clusterrole self-provisioner` <br/>
+
 > <span style="color:red">**clusterrolebindings = self-provisioners**</span><br/>
 > **clusterrole = self-provisioner**
 
 Remove self-provisioner role from system such that authenticated users can't create projects<br/>
-```
-oc adm policy remove-cluster-role-from-group self-provisioner \
-  system:authenticated:oauth
-```
+
+`oc adm policy remove-cluster-role-from-group self-provisioner \`<br/>
+&nbsp;&nbsp;`system:authenticated:oauth`
 
 Restore self-provisioners back to cluster as original<br/>
-```
-oc adm policy add-cluster-role-to-group \
-  --rolebinding-name self-provisioners self-provisioner system:authenticated:oauth
-```
+
+`oc adm policy add-cluster-role-to-group \` <br/>
+&nbsp;&nbsp;`--rolebinding-name self-provisioners self-provisioner system:authenticated:oauth`
 
 Creating new groups
-```
-oc adm group new dev-users dev1 dev2
-oc adm group new qa-users qa1 qa2
-```
+
+`oc adm group new dev-users dev1 dev2` <br/>
+`oc adm group new qa-users qa1 qa2`
 
 Assign roles at namespace/project level. You will need admin role to assign users.
-```
-oc policy add-role-to-group edit dev-users -n namespace
-oc policy add-role-to-group view qa-users -n namespace
-oc policy add-role-to-user admin user1 -n namespace
-```
+
+`oc policy add-role-to-group edit dev-users -n namespace` <br/>
+`oc policy add-role-to-group view qa-users -n namespace` <br/>
+`oc policy add-role-to-user admin user1 -n namespace`
 
 Get all the rolebindings for the current namespace<br/>
 `oc get rolebindings -o wide`
@@ -156,41 +149,41 @@ Instead of removing/deleting the user, we will remove the password from the syst
 # 7. Secrets and ConfigMaps #
 
 Create secrets from literals and apply to a deployment
-```
-oc create secret generic secretname --from-literal key1=value1 \
-        --from-literal key2=value2
-oc set env deployment/hello --from secret/secretname
-```
+
+`oc create secret generic secretname --from-literal key1=value1 \` <br/>
+&nbsp;&nbsp;`--from-literal key2=value2` <br/>
+`oc set env deployment/hello --from secret/secretname`
 
 Mount the secret file into the pod filesystem<br/>
-```
-oc set volume deployment/demo --add --type secret --secret-name demo-secret \
-        --mount-path /app-secrets
-```
+
+`oc set volume deployment/demo --add --type secret --secret-name demo-secret \` <br/>
+ &nbsp;&nbsp;`--mount-path /app-secrets`
 
 Example of setting env variables that contain sensitive data
-```
-oc create secret generic mysql \
-        --from-literal user=dba \
-        --from-literal password=redhat123 \
-        --from-literal database=test \
-        --from-literal hostname=mysql
 
-oc new-app --name mysql \
-        --docker-image registry.access.redhat.com/rhscl/mysql-57-rhel7:5.7-47
+`oc create secret generic mysql \` <br/>
+ &nbsp;&nbsp;`--from-literal user=dba \` <br/>
+ &nbsp;&nbsp;`--from-literal password=redhat123 \` <br/>
+ &nbsp;&nbsp;`--from-literal database=test \` <br/>
+ &nbsp;&nbsp;`-from-literal hostname=mysql`
 
-oc set env deployment/mysql --prefix MYSQL_ --from secret/mysql
-```
+`oc new-app --name mysql \` <br/>
+&nbsp;&nbsp;`--docker-image registry.access.redhat.com/rhscl/mysql-57-rhel7:5.7-47`
+
+`oc set env deployment/mysql --prefix MYSQL_ --from secret/mysql`
+
 To use a private image in quay.io using secrets stored in files
-```
-podman login -u quay-username quay.io
 
-oc create secret generic quayio \
-        --from-file .dockerconfigjson=${XDG_RUNTIME_DIR}/containers/auth.json \
-        --type kubernetes.io/dockerconfigjson
-oc secrets link default quayio --for pull        
-oc import-image php --from quay.io/quay-username/php-70-rhel7 --confirm
-```
+`podman login -u quay-username quay.io`
+
+`oc create secret generic quayio \` <br/>
+&nbsp;&nbsp;`--from-file .dockerconfigjson=${XDG_RUNTIME_DIR}/containers/auth.json \` <br/>
+&nbsp;&nbsp;`--type kubernetes.io/dockerconfigjson`
+        
+`oc secrets link default quayio --for pull`
+
+`oc import-image php --from quay.io/quay-username/php-70-rhel7 --confirm`
+
 # 8. Secure Routes #
 
 Using openssl generate a private key and a public key
@@ -231,11 +224,10 @@ Get details of scc anyuid<br/>
 `oc describe scc anyuid`
 
 Create a service account in the current project and assign the anyuid priviledges to the service account.
-```
-oc create serviceaccount svc-name
-oc adm policy add-scc-to-user anyuid -z svc-name -n namespace
-oc set serviceaccount deployment/demo svc-name
-```
+
+`oc create serviceaccount svc-name` <br/>
+`oc adm policy add-scc-to-user anyuid -z svc-name -n namespace` <br/>
+`oc set serviceaccount deployment/demo svc-name` <br/>
 
 review the scc priviledges needed for a pod<br/>
 `oc get po/podname-756ff-9cjbj -o yaml | oc adm policy scc-subject-review -f -`
@@ -318,11 +310,11 @@ Container   memory    4Mi   1Gi  100Mi            200Mi          -
 ```
 # 11. Scaling and AutoScaler #
 
-oc scale --replicas 3 deployment/demo
+`oc scale --replicas 3 deployment/demo`
 
-oc autoscale dc/demo --min 1 --max 10 --cpu-percent 80
+`oc autoscale dc/demo --min 1 --max 10 --cpu-percent 80`
 
-oc get hpa
+`oc get hpa`
 
 # 12. Readiness and Liveness #
 
