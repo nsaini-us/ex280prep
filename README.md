@@ -165,7 +165,7 @@ Example of setting env variables that contain sensitive data
  &nbsp;&nbsp;`--from-literal user=dba \` <br/>
  &nbsp;&nbsp;`--from-literal password=redhat123 \` <br/>
  &nbsp;&nbsp;`--from-literal database=test \` <br/>
- &nbsp;&nbsp;`-from-literal hostname=mysql`
+ &nbsp;&nbsp;`--from-literal hostname=mysql`
 
 `oc new-app --name mysql \` <br/>
 &nbsp;&nbsp;`--docker-image registry.access.redhat.com/rhscl/mysql-57-rhel7:5.7-47`
