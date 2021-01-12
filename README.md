@@ -187,30 +187,27 @@ To use a private image in quay.io using secrets stored in files
 # 8. Secure Routes #
 
 Using openssl generate a private key and a public key
-```
-openssl req -x509 -newkey rsa:2048 -nodes -keyout cert.key -out cert.crt \
-                -subj "/C=US/ST=FL/L=Tampa/O=IBM/CN=*.apps.acme.com" -days 365
-```
+
+`openssl req -x509 -newkey rsa:2048 -nodes -keyout cert.key -out cert.crt \` <br/>
+&nbsp;&nbsp;`-subj "/C=US/ST=FL/L=Tampa/O=IBM/CN=*.apps.acme.com" -days 365`
+
 Using the key and cert create a TLS secret<br/>
 `oc create secret tls demo-certs --cert cert.crt --key cert.key`
 
 Mount the tls certs into the pod (using deployment)<br/>
-```
-oc set volume deployment/demo --add --type=secret --secret-name demo-tls \
-                --mount-path /usr/local/etc/ssl/certs --name tls-mount
-```
+
+`oc set volume deployment/demo --add --type=secret --secret-name demo-tls \` <br/>
+&nbsp;&nbsp;`--mount-path /usr/local/etc/ssl/certs --name tls-mount`
 
 Now create a passthrough route<br/>
-```
-oc create route passthrough demo-https --service demo-https --port 8443 \
-                --hostname demo-https.apps.ocp4.example.com
-```
+
+`oc create route passthrough demo-https --service demo-https --port 8443 \` <br/>
+&nbsp;&nbsp;`--hostname demo-https.apps.ocp4.example.com`
 
 Using edge route with same certs<br/>
-```
-oc expose route edge demo-https --service api-frontend --hostname api.apps.acme.com \
-                --key cert.key --cert cert.crt
-```
+
+`oc expose route edge demo-https --service api-frontend --hostname api.apps.acme.com \`
+ &nbsp;&nbsp;`--key cert.key --cert cert.crt`
 
 Export the router cert in case we need to use it as a ca-cert<br/>
 `oc extract secrets/router-ca --keys tls.crt -n openshift-ingress-operator --to /tmp/`
@@ -247,20 +244,18 @@ Check the node resources<br/>
 `oc describe node node1`
 
 Set resources on a deployment. Request limits are how much each request is allowed, and limit is the max allowed <br/>
-```
-oc set resources deployment hello-world-nginx \
-                --requests cpu=10m,memory=20Mi --limits cpu=180m,memory=100Mi
-```
+
+`oc set resources deployment hello-world-nginx \` <br/>
+&nbsp;&nbsp;`--requests cpu=10m,memory=20Mi --limits cpu=180m,memory=100Mi`
 
 Quota is project level resources available<br/>
 `oc create quota dev-quota --hard services=10,cpu=1300,memory=1.5Gi`
 
 Cluster Quota is resources available across multiple projects<br/>
-```
-oc create clusterquota env-qa \
-                --project-annotation-selector.openshift.io/requester=qa \
-                --hard pods=12,secrets=20,services=5
-```
+
+`oc create clusterquota env-qa \` <br/>
+&nbsp;&nbsp;`--project-annotation-selector.openshift.io/requester=qa \` <br/>
+&nbsp;&nbsp;`--hard pods=12,secrets=20,services=5`
 
 Show all project annotations and labels<br/>
 `oc describe namespace demo`
@@ -329,18 +324,19 @@ Probes have the following configuration settings:
 - __failureThreshold__: not required, default value=3, min consecutive failures to be considered a failure
 
 Examples of setting probes:
+
+`oc set probe dc/demo --readiness --initial-delay-seconds 20`
+
+`oc set probe dc/webapp --readiness --get-url=http://:8080/healthz \`
+&nbsp;&nbsp;`--period-seconds 10 --timeout-seconds 1 --initial-delay-seconds 30`
+
+`oc set probe dc/mq --liveness --open-tcp 1414 --period-seconds 3 \`
+`--timeout-seconds 2 --failure-threshold 3 --initial-delay-seconds 30`
+
+`oc set probe dc/ace --liveness --get-url http://:7600/healthz \` <br/>
+&nbsp;&nbsp;`--initial-delay-seconds 30 --period-seconds 10 --dry-run=client -o json | \` <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;`jq .spec.template.spec.containers[].livenessProbe`
 ```
-oc set probe dc/demo --readiness --initial-delay-seconds 20
-
-oc set probe dc/webapp --readiness --get-url=http://:8080/healthz \
-   --period-seconds 10 --timeout-seconds 1 --initial-delay-seconds 30
-
-oc set probe dc/mq --liveness --open-tcp 1414 --period-seconds 3 \
-   --timeout-seconds 2 --failure-threshold 3 --initial-delay-seconds 30
-
-oc set probe dc/ace --liveness --get-url http://:7600/healthz \
-      --initial-delay-seconds 30 --period-seconds 10 --dry-run=client -o json | \
-      jq .spec.template.spec.containers[].livenessProbe
 {
   "httpGet": {
     "path": "/healthz",
@@ -350,10 +346,11 @@ oc set probe dc/ace --liveness --get-url http://:7600/healthz \
   "initialDelaySeconds": 30,
   "periodSeconds": 10
 }
-
-oc set probe dc/mq --liveness --open-tcp 1414 --period-seconds 3 \
-      --timeout-seconds 2 --failure-threshold 3 --initial-delay-seconds 30 \
-      --dry-run=client -o json | jq .spec.template.spec.containers[].livenessProbe
+```
+`oc set probe dc/mq --liveness --open-tcp 1414 --period-seconds 3 \` <br/>
+&nbsp;&nbsp;`--timeout-seconds 2 --failure-threshold 3 --initial-delay-seconds 30 \` <br/>
+&nbsp;&nbsp;`-dry-run=client -o json | jq .spec.template.spec.containers[].livenessProbe`
+```
 {
   "tcpSocket": {
     "port": 1414
