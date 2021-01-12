@@ -12,7 +12,8 @@
 &nbsp;&nbsp;`--patch '{"spec":{"template":{"spec":{"nodeSelector":{"env":"dev"}}}}}'`
         
 `oc adm new-project demo --node-selector "env=dev"` <br/>
-`oc annotate namespace demo openshift.io/node-selector "env=dev" --overwrite` <br/>
+`oc annotate namespace demo openshift.io/node-selector "env=dev" --overwrite` 
+
 `oc patch namespace demo \` <br/>
 &nbsp;&nbsp;`--patch '{"metadata":{"annotations":{"openshift.io/node-selector": "env=dev"}}}'`
 
@@ -38,10 +39,10 @@ Taints:      dedicated=foo:NoSchedule
              test=foo:NoSchedule
              
 ```
-Delete node taint<br/>
+delete node taint<br/>
 `oc adm taint node node1 dedicated-`
 
-Delete the other key<br/>
+delete the other key<br/>
 `oc adm taint node node1 test-`
 
 # 4. OAuth #
@@ -50,7 +51,6 @@ Install htpasswd command line utility<br/>
 `sudo yum install httpd-tools`
 
 Create a new file for htpass with users and their passwords
-
 `htpasswd -c -b /tmp/htpass user1 password1` <br/>
 `htpasswd -b /tmp/htpass user2 password2`
 
@@ -69,7 +69,6 @@ spec:
         name: htpass-secret
 ```
 Create a new secret which will hold the users and password file<br/>
-
 `oc create secret generic htpass-secret \` <br/>
 &nbsp;&nbsp;`--from-file htpasswd=/tmp/htpass -n openshift-config`
 
@@ -85,13 +84,11 @@ Lets delete user2 from htpass file<br/>
 Update the secret with new htpass<br/>
 `oc set data secret/htpass-secret --from-file htpasswd=/tmp/htpass -n openshift-config`
 
-Delete the user and identity from the system
-
+delete the user and identity from the system
 `oc delete user user2` <br/>
 `oc delete identity localusers:user2`
 
 delete all users and identities defined in OAuth
-
 `oc delete user --all` <br/>
 `oc delete identity --all`
 
@@ -107,7 +104,6 @@ Get current clusterrolebindings configured for self-provisioners<br/>
 `oc get clusterrolebindings -o wide |grep -E "NAME|self-provisioners"`
 
 Describe the clusterrolebindings and clusterrole<br/>
-
 `oc describe clusterrolebindings self-provisioners` <br/>
 `oc describe clusterrole self-provisioner` <br/>
 
@@ -115,22 +111,18 @@ Describe the clusterrolebindings and clusterrole<br/>
 > **clusterrole = self-provisioner**
 
 Remove self-provisioner role from system such that authenticated users can't create projects<br/>
-
-`oc adm policy remove-cluster-role-from-group self-provisioner \`<br/>
+`oc adm policy remove-cluster-role-from-group self-provisioner \` <br/>
 &nbsp;&nbsp;`system:authenticated:oauth`
 
 Restore self-provisioners back to cluster as original<br/>
-
 `oc adm policy add-cluster-role-to-group \` <br/>
 &nbsp;&nbsp;`--rolebinding-name self-provisioners self-provisioner system:authenticated:oauth`
 
 Creating new groups
-
 `oc adm group new dev-users dev1 dev2` <br/>
 `oc adm group new qa-users qa1 qa2`
 
 Assign roles at namespace/project level. You will need admin role to assign users.
-
 `oc policy add-role-to-group edit dev-users -n namespace` <br/>
 `oc policy add-role-to-group view qa-users -n namespace` <br/>
 `oc policy add-role-to-user admin user1 -n namespace`
@@ -149,18 +141,15 @@ Instead of removing/deleting the user, we will remove the password from the syst
 # 7. Secrets and ConfigMaps #
 
 Create secrets from literals and apply to a deployment
-
 `oc create secret generic secretname --from-literal key1=value1 \` <br/>
 &nbsp;&nbsp;`--from-literal key2=value2` <br/>
 `oc set env deployment/hello --from secret/secretname`
 
 Mount the secret file into the pod filesystem<br/>
-
 `oc set volume deployment/demo --add --type secret --secret-name demo-secret \` <br/>
  &nbsp;&nbsp;`--mount-path /app-secrets`
 
 Example of setting env variables that contain sensitive data
-
 `oc create secret generic mysql \` <br/>
  &nbsp;&nbsp;`--from-literal user=dba \` <br/>
  &nbsp;&nbsp;`--from-literal password=redhat123 \` <br/>
@@ -173,7 +162,6 @@ Example of setting env variables that contain sensitive data
 `oc set env deployment/mysql --prefix MYSQL_ --from secret/mysql`
 
 To use a private image in quay.io using secrets stored in files
-
 `podman login -u quay-username quay.io`
 
 `oc create secret generic quayio \` <br/>
@@ -187,7 +175,6 @@ To use a private image in quay.io using secrets stored in files
 # 8. Secure Routes #
 
 Using openssl generate a private key and a public key
-
 `openssl req -x509 -newkey rsa:2048 -nodes -keyout cert.key -out cert.crt \` <br/>
 &nbsp;&nbsp;`-subj "/C=US/ST=FL/L=Tampa/O=IBM/CN=*.apps.acme.com" -days 365`
 
@@ -195,17 +182,14 @@ Using the key and cert create a TLS secret<br/>
 `oc create secret tls demo-certs --cert cert.crt --key cert.key`
 
 Mount the tls certs into the pod (using deployment)<br/>
-
 `oc set volume deployment/demo --add --type=secret --secret-name demo-tls \` <br/>
 &nbsp;&nbsp;`--mount-path /usr/local/etc/ssl/certs --name tls-mount`
 
 Now create a passthrough route<br/>
-
 `oc create route passthrough demo-https --service demo-https --port 8443 \` <br/>
 &nbsp;&nbsp;`--hostname demo-https.apps.ocp4.example.com`
 
 Using edge route with same certs<br/>
-
 `oc expose route edge demo-https --service api-frontend --hostname api.apps.acme.com \`
  &nbsp;&nbsp;`--key cert.key --cert cert.crt`
 
@@ -221,7 +205,6 @@ Get details of scc anyuid<br/>
 `oc describe scc anyuid`
 
 Create a service account in the current project and assign the anyuid priviledges to the service account.
-
 `oc create serviceaccount svc-name` <br/>
 `oc adm policy add-scc-to-user anyuid -z svc-name -n namespace` <br/>
 `oc set serviceaccount deployment/demo svc-name` <br/>
@@ -230,13 +213,11 @@ review the scc priviledges needed for a pod<br/>
 `oc get po/podname-756ff-9cjbj -o yaml | oc adm policy scc-subject-review -f -`
 
 Example of gitlab being run as anyuid using serviceaccount
-```
-oc new-app --name gitlab --docker-image quay.io/redhattraiing/gitlab-ce:8.4.3-ce.0
-oc get po/gitlab-6c5b5c5d55-gzkct -o yaml | oc adm policy scc-subject-review -f -
-oc create sa gitlab-sa
-oc adm policy add-scc-to-user anyuid -z gitlab-sa
-oc set sa deployment/gitlab gitlab-sa
-```
+`oc new-app --name gitlab --docker-image quay.io/redhattraiing/gitlab-ce:8.4.3-ce.0` <br/>
+`oc get po/gitlab-6c5b5c5d55-gzkct -o yaml | oc adm policy scc-subject-review -f -` <br/>
+`oc create sa gitlab-sa` <br/>
+`oc adm policy add-scc-to-user anyuid -z gitlab-sa` <br/>
+`oc set sa deployment/gitlab gitlab-sa` <br/>
 
 # 10. Limits, Quotas, and LimitRanges #
 
@@ -244,7 +225,6 @@ Check the node resources<br/>
 `oc describe node node1`
 
 Set resources on a deployment. Request limits are how much each request is allowed, and limit is the max allowed <br/>
-
 `oc set resources deployment hello-world-nginx \` <br/>
 &nbsp;&nbsp;`--requests cpu=10m,memory=20Mi --limits cpu=180m,memory=100Mi`
 
@@ -252,7 +232,6 @@ Quota is project level resources available<br/>
 `oc create quota dev-quota --hard services=10,cpu=1300,memory=1.5Gi`
 
 Cluster Quota is resources available across multiple projects<br/>
-
 `oc create clusterquota env-qa \` <br/>
 &nbsp;&nbsp;`--project-annotation-selector.openshift.io/requester=qa \` <br/>
 &nbsp;&nbsp;`--hard pods=12,secrets=20,services=5`
@@ -324,7 +303,6 @@ Probes have the following configuration settings:
 - __failureThreshold__: not required, default value=3, min consecutive failures to be considered a failure
 
 Examples of setting probes:
-
 `oc set probe dc/demo --readiness --initial-delay-seconds 20`
 
 `oc set probe dc/webapp --readiness --get-url=http://:8080/healthz \` <br/>
@@ -374,7 +352,6 @@ cluster wide svc naming scheme is service-name.namespace.svc<br/>
 `image-registry.openshift-image-registry.svc`
 
 using stored images from openshift project
-
 `oc get images` <br/>
 `oc get is -n openshift | grep httpd`
 
@@ -390,25 +367,22 @@ OR
 
 `oc new-app --name nms --image \` <br/>
 &nbsp;&nbsp;`image-registry.openshift-image-registry.svc:5000/openshift/httpd:latest`
-```
+
 Create a service<br/>
 `oc expose deployment/nms --port 8080 --target-port 8080`
 
 # 14. Deployment Strategy #
 
 Using a docker strategy using local build directory
-
 `oc new-app --strategy docker --binary --name myapp` <br/>
 `oc start-build myapp --from-dir . --follow` <br/>
 `oc expose deployment myapp --target-port 8080 --port 80` <br/?
 `oc expose svc myapp`
 
 Using a nodejs builder
-
 `oc new-app --binary --image-stream nodejs --name nodejs` <br/>
 `oc start-build nodejs --from-dir . --follow` <br/>
 `oc expose svc/nodejs`
-
 
 # 15. General Troubleshooting #
 
@@ -440,7 +414,9 @@ Connect to a service using a debug image<br/>
 After fixing the deployment (yaml or the issue at hand), the deployment might have timed out by the time the issue was fixed. In order to push the deployment a new "rollout" might be needed. <br/>
 
 `oc rollout latest dc/demo`
+
 or
+
 `oc rollout latest deployment/demo`
 
 An example app was deployed where the endpoint wasn't working. After troubleshooting it was found the name of the service was defined with app tagname was mis spelled. Had to fix the typo to get the service working again. 
