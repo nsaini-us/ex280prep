@@ -84,7 +84,7 @@ Lets delete user2 from htpass file<br/>
 Update the secret with new htpass<br/>
 `oc set data secret/htpass-secret --from-file htpasswd=/tmp/htpass -n openshift-config`
 
-delete the user and identity from the system
+delete the user and identity from the system<br/>
 `oc delete user user2` <br/>
 `oc delete identity localusers:user2`
 
@@ -302,7 +302,7 @@ Probes have the following configuration settings:
 - __successThreshold__: not required, default value=1, min consecutive successes after failure to consider success
 - __failureThreshold__: not required, default value=3, min consecutive failures to be considered a failure
 
-Examples of setting probes:
+Examples of setting probes:<br/>
 `oc set probe dc/demo --readiness --initial-delay-seconds 20`
 
 `oc set probe dc/webapp --readiness --get-url=http://:8080/healthz \` <br/>
@@ -327,7 +327,7 @@ Examples of setting probes:
 ```
 `oc set probe dc/mq --liveness --open-tcp 1414 --period-seconds 3 \` <br/>
 &nbsp;&nbsp;`--timeout-seconds 2 --failure-threshold 3 --initial-delay-seconds 30 \` <br/>
-&nbsp;&nbsp;&nbsp;&nbsp;`--dry-run=client -o json | jq .spec.template.spec.containers[].livenessProbe`
+&nbsp;&nbsp;`--dry-run=client -o json | jq .spec.template.spec.containers[].livenessProbe`
 ```
 {
   "tcpSocket": {
@@ -368,18 +368,18 @@ OR
 `oc new-app --name nms --image \` <br/>
 &nbsp;&nbsp;`image-registry.openshift-image-registry.svc:5000/openshift/httpd:latest`
 
-Create a service<br/>
+create a service<br/>
 `oc expose deployment/nms --port 8080 --target-port 8080`
 
 # 14. Deployment Strategy #
 
-Using a docker strategy using local build directory
+Using a docker strategy using local build directory <br/>
 `oc new-app --strategy docker --binary --name myapp` <br/>
 `oc start-build myapp --from-dir . --follow` <br/>
 `oc expose deployment myapp --target-port 8080 --port 80` <br/?
 `oc expose svc myapp`
 
-Using a nodejs builder
+Using a nodejs builder <br/>
 `oc new-app --binary --image-stream nodejs --name nodejs` <br/>
 `oc start-build nodejs --from-dir . --follow` <br/>
 `oc expose svc/nodejs`
@@ -404,11 +404,8 @@ oc adm taint node node-name key-
 ```
 
 Connect to a service using a debug image<br/>
-
 `oc get svc/mysql -o jsonpath="{.spec.clusterIP}{'\n'}"`
-
 `oc debug -t deployment/app --image registry.access.redhat.com/ubi8/ubi:8.0`
-
 `curl -v telnet://<clusterIP-from-above>:<port-number>`
 
 After fixing the deployment (yaml or the issue at hand), the deployment might have timed out by the time the issue was fixed. In order to push the deployment a new "rollout" might be needed. <br/>
