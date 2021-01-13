@@ -45,7 +45,7 @@ delete node taint<br/>
 delete the other key<br/>
 `oc adm taint node node1 test-`
 
-list current node taints <br/>
+list current node taints on the master node<br/>
 `oc get node/master0.nms.cp.fyre.ibm.com -o json |jq .spec.taints`
 ```
 [
