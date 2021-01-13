@@ -45,6 +45,47 @@ delete node taint<br/>
 delete the other key<br/>
 `oc adm taint node node1 test-`
 
+list current node taints <br/>
+`oc get node/master0.nms.cp.fyre.ibm.com -o json |jq .spec.taints`
+```
+[
+  {
+    "effect": "NoSchedule",
+    "key": "node-role.kubernetes.io/master"
+  }
+]
+```
+Add a new taint foo:NoSchedule <br/>
+`oc adm taint nodes master0.nms.cp.fyre.ibm.com foo:NoSchedule`
+
+list the current taints, you can see the added taint <br/>
+`oc get node/master0.nms.cp.fyre.ibm.com -o json |jq .spec.taints`
+```
+[
+  {
+    "effect": "NoSchedule",
+    "key": "foo"
+  },
+  {
+    "effect": "NoSchedule",
+    "key": "node-role.kubernetes.io/master"
+  }
+]
+```
+lets delete the taint <br/>
+`oc adm taint nodes master0.nms.cp.fyre.ibm.com foo-`
+
+list the current taints - should be back to orignal starting point <br/>
+`oc get node/master0.nms.cp.fyre.ibm.com -o json |jq .spec.taints`
+```
+[
+  {
+    "effect": "NoSchedule",
+    "key": "node-role.kubernetes.io/master"
+  }
+]
+```
+
 # 4. OAuth #
 
 Install htpasswd command line utility<br/>
