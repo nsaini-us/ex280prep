@@ -269,6 +269,8 @@ Set resources on a deployment. Request limits are how much each request is allow
 `oc set resources deployment hello-world-nginx \` <br/>
 &nbsp;&nbsp;`--requests cpu=10m,memory=20Mi --limits cpu=180m,memory=100Mi`
 
+Scheduling decisions are made based on the request to ensure that a node has enough capacity available to meet the requested value. If a container specifies limits, but omits requests, the requests are defaulted to the limits. A container is not able to exceed the specified limit on the node. The enforcement of limits is dependent upon the compute resource type. If a container makes no request or limit, the container is scheduled to a node with no resource guarantees.
+
 Quota is project level resources available<br/>
 `oc create quota dev-quota --hard services=10,cpu=1300,memory=1.5Gi`
 
