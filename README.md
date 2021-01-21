@@ -231,7 +231,7 @@ Now create a passthrough route<br/>
 &nbsp;&nbsp;`--hostname demo-https.apps.ocp4.example.com`
 
 Using edge route with same certs<br/>
-`oc expose route edge demo-https --service api-frontend --hostname api.apps.acme.com \` <br/>
+`oc create route edge demo-https --service api-frontend --hostname api.apps.acme.com \` <br/>
  &nbsp;&nbsp;`--key cert.key --cert cert.crt`
 
 Export the router cert in case we need to use it as a ca-cert<br/>
