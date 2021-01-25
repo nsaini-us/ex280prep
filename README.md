@@ -272,7 +272,10 @@ Set resources on a deployment. Request limits are how much each request is allow
 Scheduling decisions are made based on the request to ensure that a node has enough capacity available to meet the requested value. If a container specifies limits, but omits requests, the requests are defaulted to the limits. A container is not able to exceed the specified limit on the node. The enforcement of limits is dependent upon the compute resource type. If a container makes no request or limit, the container is scheduled to a node with no resource guarantees.
 
 Quota is project level resources available<br/>
-`oc create quota dev-quota --hard services=10,cpu=1300,memory=1.5Gi`
+`oc create quota dev-quota --hard services=10,cpu=1300m,memory=1.5Gi`
+
+Quota including requests and limits at namespace level. Remember if you don't provide requests values, then same limits values are used for both requests and limits<br/>
+`oc create quota my-quota --hard pods=10,requests.cpu=2,requests.memory=1Gi,limits.cpu=4,limits.memory=2Gi`
 
 Cluster Quota is resources available across multiple projects<br/>
 `oc create clusterquota env-qa \` <br/>
