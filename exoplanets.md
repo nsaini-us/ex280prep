@@ -59,6 +59,14 @@ spec:
 ```
 `oc create -f exoplanets.yaml`
 
+The above can also be accomplished by running the following commands
+```
+oc new-app --name exoplanets --docker-image quay.io/redhattraining/exoplanets:v1.0 \
+    -e DB_HOST=crdb-example-public -e DB_PORT=26257 -e DB_USER=root -e DB_NAME=postgres
+
+oc set probe deployment/exoplanets --readiness --get-url http://:8080/healthz
+```
+
 # 5. create svc and route
 
 `oc expose deployment/exoplanets --port 8080`
