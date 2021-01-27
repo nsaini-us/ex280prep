@@ -16,7 +16,7 @@ check the name of the svc that contains the ClusterIP for db-cluster
 
 `oc get svc`
 
-Copy the cluster name `crdb-example-public`
+Copy the cluster name `crdb-example-public` and use it for DB_HOST env variable
 
 # 4. Create the deployment
 ```
