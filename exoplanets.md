@@ -4,7 +4,7 @@ Select Database, to display the list of database operators. In the filters selec
 Install the operator by selecting the following options: "Update Channel = stable" and "Installation Mode = A specific namespace on the cluster" 
 and enter the namespace above and then hit install.
 
-# 2. Create db cluster
+# 2. Create DB cluster
 Once operator is successfully installed, click on Operators -> Installed Operators and click on the installed operator.
 Next select create instance of the db cluster. Select all defaults except turn off TLS and name as crdb-example, hit create.
 Wait for the db cluster (3 nodes) to start.
