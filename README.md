@@ -219,6 +219,12 @@ Using openssl generate a private key and a public key <br/>
 `openssl req -x509 -newkey rsa:2048 -nodes -keyout cert.key -out cert.crt \` <br/>
 &nbsp;&nbsp;`-subj "/C=US/ST=FL/L=Tampa/O=IBM/CN=*.apps.acme.com" -days 365`
 
+If additional subjectAtlName DNS extensions are needed <br/>
+`openssl req -x509 -newkey rsa:2048 -nodes -keyout cert.key -out cert.crt \` <br/>
+&nbsp;&nbsp;`-subj "/C=US/ST=FL/L=Tampa/O=IBM/CN=*.apps.acme.com" -days 365 \` <br/>
+&nbsp;&nbsp;`-addext "subjectAltName = DNS:host1.apps.acme.com,DNS:host2.apps.acme.com"`
+
+
 Using the key and cert create a TLS secret<br/>
 `oc create secret tls demo-certs --cert cert.crt --key cert.key`
 
